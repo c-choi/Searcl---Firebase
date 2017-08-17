@@ -1,4 +1,3 @@
-from apscheduler.schedulers.blocking import BlockingScheduler
 import time
 import pyrebase
 from urllib.request import urlopen
@@ -65,6 +64,4 @@ for c in category.keys():
         print(post)
         print(user_post)
 
-    scheduler = BlockingScheduler()
-    scheduler.add_job(writeNewPost(UID, USERNAME, PICTURE, TITLE, BODY), 'interval', hours=1)
-    scheduler.start()
+    writeNewPost(UID, USERNAME, PICTURE, TITLE, BODY)
