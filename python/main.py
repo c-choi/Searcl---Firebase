@@ -11,11 +11,11 @@ for c in category.keys():
     response = urlopen(url)
     plain_text = response.read()
     soup = BeautifulSoup(plain_text, 'html.parser')
-    lists = soup.select('dl')
+    lists = soup.select('dt')
     body_data = ""
     i = 1
 
-    for list in range(len(lists)-1):
+    for list in range(len(lists)-7):
         try:
             body_data += str(i) + ". " + lists[list].find('a').text.strip() + "\n\n"
             i += 1
@@ -25,12 +25,11 @@ for c in category.keys():
     print(body_data)
 
     UID = '5rCTVQtsUvW0Yti7mwijlmZnKRv1'
-    USERNAME = 'news_bot'
-    PICTURE = ''
+    USERNAME = 'NewsBot'
+    PICTURE = 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'
     TITLE = category[c] + ' ' + title
     BODY = body_data
     URL = 'https://searcl-ce85f.firebaseio.com/'
-
 
     config = {
       "apiKey": "AIzaSyAkaWESNGQro0lAO9WX2o3rFoJHZ4toHhk",

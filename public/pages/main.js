@@ -19,7 +19,8 @@
 var messageForm = document.getElementById('message-form');
 var messageInput = document.getElementById('new-post-message');
 var titleInput = document.getElementById('new-post-title');
-var signInButton = document.getElementById('sign-in-button');
+var signInButtonG = document.getElementById('sign-in-button-g');
+var signInButtonF = document.getElementById('sign-in-button-f');
 var signOutButton = document.getElementById('sign-out-button');
 var splashPage = document.getElementById('page-splash');
 var addPost = document.getElementById('add-post');
@@ -32,10 +33,10 @@ var myPostsMenuButton = document.getElementById('menu-my-posts');
 var myTopPostsMenuButton = document.getElementById('menu-my-top-posts');
 var listeningFirebaseRefs = [];
 
-function linkify(text) {
+function linkify(text, title) {
     var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     return text.replace(urlRegex, function(url) {
-        return '<a href="' + url + '">' + url + '</a>';
+        return title + '</br><a href="' + url + '">' + url + '</a>';
     });
 }
 
@@ -89,6 +90,24 @@ function toggleStar(postRef, uid) {
 }
 // [END post_stars_transaction]
 
+function toggleDelete(globalPostRef, userPostRef, authorId) {
+  if (firebase.auth().currentUser.uid == authorId) {
+    if (confirm("Are you sure you want to delete this post?")) {
+      globalPostRef.remove()
+      userPostRef.remove()
+    } else {
+      return
+    }
+  }
+  else alert("Cannot delete other person's Post");
+};
+
+function toggleDeleteComment(postId, id) {
+  if (firebase.auth().currentUser.uid == id) {
+    alert(id + postId);
+    postId.remove()
+  }
+};
 /**
  * Creates a post element.
  */
@@ -97,7 +116,7 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
 
   var html =
       '<div class="post post-' + postId + ' mdl-cell mdl-cell--12-col ' +
-                  'mdl-cell--6-col-tablet mdl-cell--4-col-desktop mdl-grid mdl-grid--no-spacing">' +
+                  'mdl-cell--4-col-tablet mdl-cell--3-col-desktop mdl-grid mdl-grid--no-spacing">' +
         '<div class="mdl-card mdl-shadow--2dp">' +
           '<div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">' +
             '<h4 class="mdl-card__title-text"></h4>' +
@@ -139,7 +158,7 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
   var unStar = postElement.getElementsByClassName('not-starred')[0];
 
   // Set values.
-  postElement.getElementsByClassName('text')[0].innerText = linkify(text);
+  postElement.getElementsByClassName('text')[0].innerHTML = linkify(text, title).replace(/\n/ig, "<br />");
   postElement.getElementsByClassName('mdl-card__title-text')[0].innerText = title;
   postElement.getElementsByClassName('username')[0].innerText = author || 'Anonymous';
   postElement.getElementsByClassName('avatar')[0].style.backgroundImage = 'url("' +
@@ -187,6 +206,13 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
     commentInput.value = '';
     commentInput.parentElement.MaterialTextfield.boundUpdateClassesHandler();
   };
+  
+  var onDeleteClicked = function() {
+    var globalPostRef = firebase.database().ref('/posts/' + postId);
+    var userPostRef = firebase.database().ref('/user-posts/' + authorId + '/' + postId);
+    toggleDelete(globalPostRef, userPostRef, authorId);
+  };
+  postElement.getElementsByClassName('delete_forever')[0].onclick = onDeleteClicked;
 
   // Bind starring action.
   var onStarClicked = function() {
@@ -238,12 +264,14 @@ function updateStarCount(postElement, nbStart) {
 function addCommentElement(postElement, id, text, author) {
   var comment = document.createElement('div');
   comment.classList.add('comment-' + id);
-  comment.innerHTML = '<span class="username"></span><span class="comment"></span>';
+  comment.innerHTML = '<span class="username"></span><span class="comment"></span><div style="float:right;" class="clear material-icons">clear</div>';
   comment.getElementsByClassName('comment')[0].innerText = text;
   comment.getElementsByClassName('username')[0].innerText = author || 'Anonymous';
 
   var commentsContainer = postElement.getElementsByClassName('comments-container')[0];
   commentsContainer.appendChild(comment);
+
+  // document.getElementById('delComment').onclick = comment.getElementsByClassName('comment')[0].removeChild(child);
 }
 
 /**
@@ -408,10 +436,14 @@ function showSection(sectionElement, buttonElement) {
 // Bindings on load.
 window.addEventListener('load', function() {
   // Bind Sign in button.
-  signInButton.addEventListener('click', function() {
+  signInButtonG.addEventListener('click', function() {
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider);
-  });
+  })
+  signInButtonF.addEventListener('click', function() {
+    var provider = new firebase.auth.FacebookAuthProvider();
+    firebase.auth().signInWithPopup(provider);
+  })
 
   // Bind Sign out button.
   signOutButton.addEventListener('click', function() {
