@@ -1,5 +1,6 @@
 {
   "projects": {
-    "searcl": "searcl-ce85f"
+    "searcl": "searcl-ce85f",
+    "default": "searcl-ce85f"
   }
 }

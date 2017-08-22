@@ -32,6 +32,13 @@ var myPostsMenuButton = document.getElementById('menu-my-posts');
 var myTopPostsMenuButton = document.getElementById('menu-my-top-posts');
 var listeningFirebaseRefs = [];
 
+function linkify(text) {
+    var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlRegex, function(url) {
+        return '<a href="' + url + '">' + url + '</a>';
+    });
+}
+
 /**
  * Saves a new post to the Firebase DB.
  */
@@ -102,6 +109,7 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
             '</div>' +
           '</div>' +
           '<span class="star">' +
+            '<div class="delete_forever material-icons">delete_forever</div>' +
             '<div class="not-starred material-icons">star_border</div>' +
             '<div class="starred material-icons">star</div>' +
             '<div class="star-count">0</div>' +
@@ -131,7 +139,7 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
   var unStar = postElement.getElementsByClassName('not-starred')[0];
 
   // Set values.
-  postElement.getElementsByClassName('text')[0].innerText = text;
+  postElement.getElementsByClassName('text')[0].innerText = linkify(text);
   postElement.getElementsByClassName('mdl-card__title-text')[0].innerText = title;
   postElement.getElementsByClassName('username')[0].innerText = author || 'Anonymous';
   postElement.getElementsByClassName('avatar')[0].style.backgroundImage = 'url("' +
