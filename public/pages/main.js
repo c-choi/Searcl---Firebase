@@ -99,15 +99,9 @@ function toggleDelete(globalPostRef, userPostRef, authorId) {
       return
     }
   }
-  else alert("Cannot delete other person's Post");
+  else alert("Cannot delete other person's post.");
 };
 
-function toggleDeleteComment(postId, id) {
-  if (firebase.auth().currentUser.uid == id) {
-    alert(id + postId);
-    postId.remove()
-  }
-};
 /**
  * Creates a post element.
  */
@@ -264,14 +258,13 @@ function updateStarCount(postElement, nbStart) {
 function addCommentElement(postElement, id, text, author) {
   var comment = document.createElement('div');
   comment.classList.add('comment-' + id);
-  comment.innerHTML = '<span class="username"></span><span class="comment"></span><div style="float:right;" class="clear material-icons">clear</div>';
+  comment.innerHTML = '<span class="username"></span><span class="comment"></span><span onclick="deleteComment(\'' +id+ '\')" style="float:right;" class="material-icons delete-comment"></span>';
   comment.getElementsByClassName('comment')[0].innerText = text;
   comment.getElementsByClassName('username')[0].innerText = author || 'Anonymous';
+  comment.getElementsByClassName('delete-comment')[0].innerText = "clear";
 
   var commentsContainer = postElement.getElementsByClassName('comments-container')[0];
   commentsContainer.appendChild(comment);
-
-  // document.getElementById('delComment').onclick = comment.getElementsByClassName('comment')[0].removeChild(child);
 }
 
 /**
@@ -290,6 +283,18 @@ function deleteComment(postElement, id) {
   var comment = postElement.getElementsByClassName('comment-' + id)[0];
   comment.parentElement.removeChild(comment);
 }
+
+// function toggleDeleteComment(postElement, id) {
+  // if (firebase.auth().currentUser.uid == postId) {
+  //   if (confirm("Delete comment?")) {
+  //     var comment = postElement.getElementsByClassName('comment-' + id)[0];
+  //     comment.parentElement.removeChild(comment);
+  // } else {
+  //   return
+  // }
+// }
+//   else alert("Cannot delete other person's comment.")
+// };
 
 /**
  * Starts listening for new posts and populates posts lists.
